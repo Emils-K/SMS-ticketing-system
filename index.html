@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="app_title">IT Helpdesk Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --surface-hover: #f1f3f5;
+            --primary-accent: #dc3545;
+            --primary-hover: #c82333;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
+            --border-radius: 10px;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(220, 53, 69, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(40, 167, 69, 0.02) 0%, transparent 40%);
+        }
+
+        header {
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            color: var(--primary-accent);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .lang-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            color: #212529;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lang-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 2.5fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 30px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            background: var(--primary-accent);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .ticket-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .ticket-item {
+            background: #fff;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .ticket-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .priority-badge {
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .priority-High {
+            background: rgba(255, 76, 76, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(255, 76, 76, 0.3);
+        }
+
+        .priority-Medium {
+            background: rgba(255, 184, 76, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(255, 184, 76, 0.3);
+        }
+
+        .priority-Low {
+            background: rgba(0, 208, 132, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(0, 208, 132, 0.3);
+        }
+
+        .ticket-details {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .ticket-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .ticket-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .assign-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 16px;
+        }
+
+        select,
+        input,
+        textarea {
+            flex: 1;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            color: var(--text-primary);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            cursor: pointer;
+        }
+
+        select:focus,
+        input:focus,
+        textarea:focus {
+            border-color: var(--primary-accent);
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1);
+        }
+
+        select option {
+            background: #fff;
+            color: var(--text-primary);
+        }
+
+        .btn {
+            background: var(--primary-accent);
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #f1f3f5;
+            color: var(--text-primary);
+            border: 1px solid #dee2e6;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .btn-outline-danger {
+            background: transparent;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 8px;
+        }
+
+        .btn-outline-danger:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .dev-tools-toggle {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-accent);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+            z-index: 999;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .dev-tools-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        .dev-tools-panel {
+            display: none;
+            position: fixed;
+            bottom: 90px;
+            left: 30px;
+            width: 400px;
+            z-index: 998;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .specialist-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .specialist-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .specialist-item:last-child {
+            border-bottom: none;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--primary-accent);
+            flex-shrink: 0;
+            border: 1px solid #dee2e6;
+        }
+
+        .spec-info {
+            flex: 1;
+        }
+
+        .spec-info h4 {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .spec-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 2px;
+        }
+
+        .spec-role {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            min-width: 300px;
+            background: var(--success);
+            color: #fff;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .assigned-tag {
+            color: var(--success);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-top: 16px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        /* Search & Filter Styles */
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            background: #fff;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 2;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .search-wrapper input {
+            padding-left: 40px;
+        }
+
+        .sort-wrapper {
+            flex: 1;
+        }
+
+        /* Bulk Actions Bar */
+        .bulk-actions-bar {
+            display: none;
+            position: sticky;
+            top: 85px;
+            z-index: 90;
+            background: var(--primary-accent);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+            animation: fadeInDown 0.3s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .bulk-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        input[type="checkbox"]:checked+.custom-checkbox {
+            background: var(--primary-accent);
+            border-color: var(--primary-accent);
+        }
+
+        input[type="checkbox"]:checked+.custom-checkbox::after {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .ticket-item.selected {
+            border-left: 4px solid var(--primary-accent);
+            background: rgba(220, 53, 69, 0.02);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <i class="fa-solid fa-headset"></i> <span data-i18n="app_title">IT Atbalsta Vadības Centrs</span>
+        </div>
+        <div class="header-controls">
+            <span style="font-size: 0.9rem; color: var(--text-secondary);"><i class="fa-solid fa-server"></i> <span
+                    data-i18n="monitoring">Sistēmas Uzraudzība</span></span>
+            <button class="lang-toggle" onclick="toggleLanguage()">
+                <i class="fa-solid fa-earth-europe"></i> <span id="current-lang">EN</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Main Content area (Requests) -->
+        <main>
+            <div class="card">
+                <div class="card-title">
+                    <span data-i18n="incoming">Ienākošie Pieteikumi</span> <span class="badge" id="request-count">...
+                        <span data-i18n="pending">Gaida</span></span>
+                </div>
+
+                <div class="filter-controls">
+                    <div class="search-wrapper">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="ticket-search" placeholder="Search name, room, or problem..."
+                            oninput="handleFilterChange()">
+                    </div>
+                    <div class="sort-wrapper">
+                        <select id="priority-sort" onchange="handleFilterChange()">
+                            <option value="none" data-i18n="sort_none">Default Sorting</option>
+                            <option value="high-to-low" data-i18n="sort_priority">Priority: High to Low</option>
+                            <option value="name-asc" data-i18n="sort_name">Name: A to Z</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="bulk-bar" class="bulk-actions-bar">
+                    <div class="bulk-info">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="select-all" hidden onchange="toggleSelectAll(this)">
+                            <div class="custom-checkbox"></div>
+                        </label>
+                        <span id="selected-count">0 items selected</span>
+                    </div>
+                    <button class="btn" style="width: auto; background: rgba(255,255,255,0.2);" onclick="bulkDelete()">
+                        <i class="fa-solid fa-trash-can"></i> <span data-i18n="delete_btn">Dzēst Pieteikumus</span>
+                    </button>
+                </div>
+
+                <div class="ticket-list" id="ticket-list">
+                    <div class="empty-state">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>
+                        <h3 data-i18n="loading">Ielādē Datus...</h3>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <div class="dev-tools-toggle" onclick="toggleDevTools()" title="Toggle Dev Tools">
+            <i class="fa-solid fa-bookmark"></i>
+        </div>
+
+        <div id="dev-tools-panel" class="dev-tools-panel">
+            <div class="card" style="border-top: 4px solid var(--primary-accent); margin-bottom: 0;">
+                <div class="card-title">
+                    <span><i class="fa-solid fa-code"></i> <span data-i18n="test_tools">Izstrādātāja Rīki</span></span>
+                    <button class="btn btn-secondary" style="width: auto; padding: 4px 10px;"
+                        onclick="toggleDevTools()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:15px;" data-i18n="test_desc">
+                    Izmanto šo pogu, lai ātri izveidotu testa pieteikumu un notestētu SMS sūtīšanu bez ārējās
+                    mājaslapas.</p>
+                <div class="form-group">
+                    <input type="text" id="demo-name" value="Test User" placeholder="..." required>
+                </div>
+                <div class="form-group">
+                    <textarea id="demo-msg" rows="2"
+                        style="resize: none;">Šis ir izmēģinājuma IT testa ziņojums SMS API testēšanai.</textarea>
+                </div>
+                <button class="btn btn-secondary" onclick="generateMockTicket()"><i class="fa-solid fa-magic"></i> <span
+                        data-i18n="create_test">Ģenerēt Testa Pieteikumu</span></button>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <aside>
+            <div class="card">
+                <div class="card-title" data-i18n="add_spec">Pievienot Speciālistu</div>
+                <form id="add-spec-form" onsubmit="addSpecialist(event)">
+                    <div class="form-group">
+                        <label data-i18n="full_name">Vārds un Uzvārds</label>
+                        <input type="text" id="spec-name" placeholder="E.g. Jānis Bērziņš" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="phone_num">Telefona Numurs</label>
+                        <input type="text" id="spec-phone" placeholder="E.g. +371 20000000" required>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="role_label">Amats / Loma</label>
+                        <input type="text" id="spec-role" placeholder="E.g. Datoru Tehniķis" required>
+                    </div>
+                    <button type="submit" class="btn"><i class="fa-solid fa-user-plus"></i> <span
+                            data-i18n="save_spec">Saglabāt Speciālistu</span></button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-title" data-i18n="avail_team">Pieejamā Komanda</div>
+                <ul class="specialist-list" id="specialist-list"></ul>
+            </div>
+        </aside>
+    </div>
+
+    <div class="toast" id="toast">
+        <i class="fa-solid fa-circle-check"></i> <span id="toast-msg">Success!</span>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000/api';
+        let specialistsConfig = [];
+        let requestsData = [];
+        let selectedIds = new Set();
+
+        // --- I18N DICTIONARY ---
+        const i18n = {
+            en: {
+                app_title: "IT Helpdesk Command Center",
+                monitoring: "Monitoring Data",
+                incoming: "Incoming Issues",
+                pending: "Pending",
+                loading: "Loading Data...",
+                all_caught_up: "All caught up!",
+                no_pending: "There are no pending IT support requests.",
+                add_spec: "Add New Specialist",
+                full_name: "Full Name",
+                phone_num: "Phone Number (For SMS)",
+                role_label: "Role / Position",
+                save_spec: "Save Specialist",
+                avail_team: "Available Team",
+                no_specs: "No specialists added yet.",
+                assigned_to: "Assigned & SMS has been fired to",
+                completed: "Completed",
+                unknown: "Unknown",
+                select_spec: "Select Specialist...",
+                assign_btn: "Assign & Send SMS",
+                room: "Rm",
+                problem: "Problem:",
+                success_spec: "Specialist Inserted Successfully!",
+                fail_spec: "Failed to add specialist. Schema maybe outdated (Restart backend)?",
+                nw_error: "Network Error. Backend offline?",
+                success_sms: "SMS successfully launched via API!",
+                fail_ticket: "Failed to assign ticket.",
+                delete_confirm: "Are you sure you want to delete this ticket?",
+                delete_btn: "Delete Ticket",
+                test_tools: "Developer Test Tools",
+                test_desc: "Use this to generate fake problems and test SMS sending without the external website.",
+                create_test: "Generate Mock Ticket",
+                mock_ticket_sent: "Mock ticket injected into system!",
+                delete_worker: "Delete Worker",
+                confirm_delete_worker: "Are you sure you want to delete this specialist? Assigned tickets will be unassigned.",
+                sort_none: "Default (Newest First)",
+                sort_priority: "Highest Priority First",
+                sort_name: "Alphabetical (A-Z)",
+                selected_count: "tickets selected",
+                bulk_confirm: "Are you sure you want to delete selected tickets?"
+            },
+            lv: {
+                app_title: "IT Atbalsta Vadības Centrs",
+                monitoring: "Sistēmas Uzraudzība",
+                incoming: "Ienākošie Pieteikumi",
+                pending: "Gaida",
+                loading: "Ielādē Datus...",
+                all_caught_up: "Viss ir izdarīts!",
+                no_pending: "Nav neviena aktīva IT atbalsta pieteikuma.",
+                add_spec: "Pievienot Speciālistu",
+                full_name: "Vārds un Uzvārds",
+                phone_num: "Telefona Numurs",
+                role_label: "Amats / Loma",
+                save_spec: "Saglabāt Speciālistu",
+                avail_team: "Pieejamā Komanda",
+                no_specs: "Neviens speciālists vēl nav pievienots.",
+                assigned_to: "Piešķirts un SMS veiksmīgi nosūtīts:",
+                completed: "Pabeigts",
+                unknown: "Nezināms",
+                select_spec: "Izvēlieties Speciālistu...",
+                assign_btn: "Piešķirt un Sūtīt SMS",
+                room: "T.",
+                problem: "Problēma:",
+                success_spec: "Speciālists Veiksmīgi Pievienots!",
+                fail_spec: "Neizdevās pievienot speciālistu. (Izdzēst datubāzi, lai atjauninātu SQLite?)",
+                nw_error: "Tīkla kļūda. Vai serveris ir ieslēgts?",
+                success_sms: "SMS veiksmīgi aizsūtīta!",
+                fail_ticket: "Neizdevās piešķirt pieteikumu.",
+                delete_confirm: "Vai tiešām vēlaties dzēst šo pieteikumu?",
+                delete_btn: "Dzēst Pieteikumu",
+                test_tools: "Izstrādātāja Rīki",
+                test_desc: "Izmanto šo rīku, lai ātri izveidotu testa pieteikumu un notestētu SMS sūtīšanu bez ārējās mājaslapas.",
+                create_test: "Ģenerēt Testa Pieteikumu",
+                mock_ticket_sent: "Testa pieteikums ievietots sistēmā!",
+                delete_worker: "Dzēst Darbinieku",
+                confirm_delete_worker: "Vai tiešām vēlaties dzēst šo speciālistu? Viņa pieteikumi tiks atiestatīti.",
+                sort_none: "Noklusējuma (Jaunākie vispirms)",
+                sort_priority: "Augstākā Prioritāte Vispirms",
+                sort_name: "Alfabētiski (A-Z)",
+                selected_count: "pieteikumi izvēlēti",
+                bulk_confirm: "Vai tiešām vēlaties dzēst izvēlētos pieteikumus?"
+            }
+        };
+
+        // UI Defaults to LATVIAN 
+        let currentLang = 'lv';
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'lv' : 'en';
+            // The button text indicates the language you can switch *to*
+            document.getElementById('current-lang').innerText = currentLang === 'lv' ? 'EN' : 'LV';
+            applyLanguage();
+            renderSpecialists();
+            fetchRequests();
+        }
+
+        function t(key) {
+            return i18n[currentLang][key] || key;
+        }
+
+        function applyLanguage() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[currentLang][key]) {
+                    el.innerText = i18n[currentLang][key];
+                }
+            });
+        }
+
+        function toggleDevTools() {
+            const panel = document.getElementById('dev-tools-panel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // --- APP LOGIC ---
+
+        async function init() {
+            applyLanguage();
+            await fetchSpecialists();
+            await fetchRequests();
+            setInterval(fetchRequests, 10000);
+        }
+
+        async function fetchSpecialists() {
+            try {
+                const response = await fetch(`${API_BASE}/specialists`);
+                if (response.ok) {
+                    specialistsConfig = await response.json();
+                    renderSpecialists();
+                }
+            } catch (error) { console.warn("API Offline"); }
+        }
+
+        function renderSpecialists() {
+            const listObj = document.getElementById('specialist-list');
+            if (specialistsConfig.length === 0) {
+                listObj.innerHTML = `<li class="empty-state" style="padding: 10px 0;"><p>${t('no_specs')}</p></li>`;
+                return;
+            }
+            listObj.innerHTML = specialistsConfig.map(spec => `
+                <li class="specialist-item">
+                    <div class="avatar">${spec.name.charAt(0)}</div>
+                    <div class="spec-info">
+                        <div class="spec-role">${spec.role || 'IT Specialist'}</div>
+                        <h4>${spec.name}</h4>
+                        <p><i class="fa-solid fa-phone"></i> ${spec.phone_number}</p>
+                    </div>
+                    <button class="btn btn-outline-danger" style="width: auto; padding: 6px 10px;" onclick="deleteSpecialist(${spec.id})" title="${t('delete_worker')}">
+                        <i class="fa-solid fa-user-minus"></i>
+                    </button>
+                </li>
+            `).join('');
+        }
+
+        async function deleteSpecialist(specId) {
+            if (!confirm(t('confirm_delete_worker'))) return;
+            try {
+                const response = await fetch(`${API_BASE}/specialists/${specId}`, { method: 'DELETE' });
+                if (response.ok) {
+                    showToast(t('success_spec'));
+                    await fetchSpecialists();
+                    await fetchRequests();
+                } else { alert(t('nw_error')); }
+            } catch (err) { alert(t('nw_error')); }
+        }
+
+        async function addSpecialist(e) {
+            e.preventDefault();
+            const payload = {
+                name: document.getElementById('spec-name').value,
+                phone_number: document.getElementById('spec-phone').value,
+                role: document.getElementById('spec-role').value
+            };
+            try {
+                const response = await fetch(`${API_BASE}/specialists`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (response.ok) {
+                    showToast(t('success_spec'));
+                    document.getElementById('add-spec-form').reset();
+                    await fetchSpecialists();
+                    await fetchRequests();
+                } else { alert(t('fail_spec')); }
+            } catch (err) { alert(t('nw_error')); }
+        }
+
+        async function generateMockTicket() {
+            const payload = {
+                first_name: document.getElementById('demo-name').value,
+                last_name: "(Test)",
+                office_number: "201A",
+                institute_branch: "Sektors B",
+                requester_email: "mock@test.com",
+                requester_phone: "+371 20000000",
+                message: document.getElementById('demo-msg').value,
+                priority: "High"
+            };
+            try {
+                await fetch(`${API_BASE}/requests`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                showToast(t('mock_ticket_sent'));
+                fetchRequests();
+            } catch (e) {
+                alert(t('nw_error'));
+            }
+        }
+
+        async function fetchRequests() {
+            try {
+                const response = await fetch(`${API_BASE}/requests`);
+                if (response.ok) {
+                    requestsData = await response.json();
+                    renderRequests();
+                }
+            } catch (error) { return; }
+        }
+
+        function handleFilterChange() {
+            renderRequests();
+        }
+
+        function renderRequests() {
+            const listObj = document.getElementById('ticket-list');
+            const searchTerm = document.getElementById('ticket-search').value.toLowerCase();
+            const sortOrder = document.getElementById('priority-sort').value;
+
+            // 1. Filter
+            let filtered = requestsData.filter(req => {
+                const searchStr = `${req.first_name} ${req.last_name} ${req.office_number} ${req.institute_branch} ${req.message}`.toLowerCase();
+                return searchStr.includes(searchTerm);
+            });
+
+            // 2. Sort
+            const priorityWeight = { 'High': 1, 'Medium': 2, 'Low': 3 };
+            if (sortOrder === 'high-to-low') {
+                filtered.sort((a, b) => priorityWeight[a.priority] - priorityWeight[b.priority]);
+            } else if (sortOrder === 'name-asc') {
+                filtered.sort((a, b) => `${a.first_name}${a.last_name}`.localeCompare(`${b.first_name}${b.last_name}`));
+            } else {
+                // Newest first by ID
+                filtered.sort((a, b) => b.id - a.id);
+            }
+
+            // Update UI counts
+            const pendingCount = requestsData.filter(r => r.status !== 'Assigned').length;
+            document.getElementById('request-count').innerHTML = `${pendingCount} ${t('pending')}`;
+            updateBulkBar();
+
+            if (filtered.length === 0) {
+                listObj.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-mug-hot"></i>
+                        <h3>${searchTerm ? 'No results found' : t('all_caught_up')}</h3>
+                        <p>${searchTerm ? 'Try a different search term.' : t('no_pending')}</p>
+                    </div>`;
+                return;
+            }
+
+            let renderedHtml = "";
+            filtered.forEach(req => {
+                const isAssigned = req.status === 'Assigned';
+                const isSelected = selectedIds.has(req.id);
+                const assignedTo = isAssigned ? specialistsConfig.find(s => s.id === req.assigned_specialist_id) : null;
+                const specOptions = specialistsConfig.map(spec => `<option value="${spec.id}">${spec.role ? spec.role + ' - ' : ''}${spec.name}</option>`).join('');
+
+                const assignUI = isAssigned
+                    ? `<div class="assigned-tag"><i class="fa-solid fa-check-double"></i> ${t('assigned_to')} ${assignedTo ? assignedTo.name : t('unknown')}</div>`
+                    : `
+                    <div class="assign-bar">
+                        <select id="select-spec-${req.id}">
+                            <option value="">${t('select_spec')}</option>
+                            ${specOptions}
+                        </select>
+                        <button class="btn" style="width: auto;" onclick="assignRequest(${req.id})">
+                            <i class="fa-solid fa-paper-plane"></i> ${t('assign_btn')}
+                        </button>
+                    </div>`;
+
+                renderedHtml += `
+                <div class="ticket-item ${isSelected ? 'selected' : ''}" style="${isAssigned ? 'opacity:0.6;' : ''}">
+                    <label class="checkbox-container" style="position: absolute; top: 20px; left: -10px; z-index: 10;">
+                        <input type="checkbox" hidden ${isSelected ? 'checked' : ''} onchange="toggleSelect(${req.id})">
+                        <div class="custom-checkbox"></div>
+                    </label>
+                    
+                    <button class="btn btn-secondary" style="position: absolute; top: 15px; right: 15px; width: 35px; height: 35px; padding: 0; border-radius: 50%;" onclick="deleteRequest(${req.id})" title="${t('delete_btn')}">
+                        <i class="fa-solid fa-trash-can" style="color: var(--danger);"></i>
+                    </button>
+                    
+                    <div class="ticket-header" style="margin-left: 25px; margin-right: 40px;">
+                        <div class="ticket-title">${req.first_name} ${req.last_name}</div>
+                        <div class="priority-badge priority-${req.priority}">${req.priority}</div>
+                    </div>
+                    <div class="ticket-meta" style="margin-left: 25px;">
+                        <span><i class="fa-solid fa-building"></i> ${req.institute_branch} - ${t('room')} ${req.office_number}</span>
+                        <span><i class="fa-solid fa-envelope"></i> ${req.requester_email}</span>
+                        <span><i class="fa-solid fa-phone"></i> ${req.requester_phone}</span>
+                    </div>
+                    <div class="ticket-details" style="margin-left: 25px;"><strong>${t('problem')}</strong><br>${req.message}</div>
+                    <div style="margin-left: 25px;">${assignUI}</div>
+                </div>`;
+            });
+            listObj.innerHTML = renderedHtml;
+        }
+
+        function toggleSelect(id) {
+            if (selectedIds.has(id)) selectedIds.delete(id);
+            else selectedIds.add(id);
+            renderRequests();
+        }
+
+        function toggleSelectAll(checkbox) {
+            if (checkbox.checked) {
+                requestsData.forEach(r => selectedIds.add(r.id));
+            } else {
+                selectedIds.clear();
+            }
+            renderRequests();
+        }
+
+        function updateBulkBar() {
+            const bar = document.getElementById('bulk-bar');
+            const countLabel = document.getElementById('selected-count');
+            const selectAll = document.getElementById('select-all');
+
+            if (selectedIds.size > 0) {
+                bar.style.display = 'flex';
+                countLabel.innerText = `${selectedIds.size} ${t('selected_count')}`;
+                selectAll.checked = (selectedIds.size === requestsData.length);
+            } else {
+                bar.style.display = 'none';
+                selectAll.checked = false;
+            }
+        }
+
+        async function bulkDelete() {
+            if (!confirm(t('bulk_confirm'))) return;
+            const ids = Array.from(selectedIds);
+            try {
+                const response = await fetch(`${API_BASE}/requests/bulk-delete`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: ids })
+                });
+                if (response.ok) {
+                    showToast(`Deleted ${ids.length} items`);
+                    selectedIds.clear();
+                    fetchRequests();
+                }
+            } catch (err) { alert(t('nw_error')); }
+        }
+
+        async function deleteRequest(reqId) {
+            if (!confirm(t('delete_confirm'))) return;
+            try {
+                const response = await fetch(`${API_BASE}/requests/${reqId}`, { method: 'DELETE' });
+                if (response.ok) {
+                    fetchRequests();
+                }
+            } catch (err) { alert(t('nw_error')); }
+        }
+
+        async function assignRequest(reqId) {
+            const specId = document.getElementById(`select-spec-${reqId}`).value;
+            if (!specId) { alert(t('select_spec')); return; }
+
+            try {
+                const response = await fetch(`${API_BASE}/requests/${reqId}/assign`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ specialist_id: parseInt(specId) })
+                });
+
+                if (response.ok) {
+                    showToast(t('success_sms'));
+                    await fetchRequests();
+                } else { alert(t('fail_ticket')); }
+            } catch (err) { alert(t('nw_error')); }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
