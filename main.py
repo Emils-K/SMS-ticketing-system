@@ -4,15 +4,25 @@ from sqlalchemy.orm import Session
 import requests
 import time
 import hashlib
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import models, schemas
 from database import engine, get_db
 import logging
 import os
 from dotenv import load_dotenv
 
+load_dotenv()
+
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Helpdesk Notifications API")
+
+# Serve dashboard
+@app.get("/")
+@app.get("/index.html")
+async def serve_index():
+    return FileResponse("index.html")
 
 # Setup CORS to allow requests from the HTML frontend
 app.add_middleware(
@@ -28,7 +38,7 @@ logging.basicConfig(level=logging.INFO)
 # --- CSC SMS INTEGRATION ---
 # IMPORTANT: Use your actual account login here!
 CSC_LOGIN = "stomatologija" # tas ir konta nosaukums kura csc ielogojas un no ka tiks viss sutits! Tas "username" csc kontam ar ko loggojas ieksa sms.csc.lv
-CSC_API_KEY = os.getenv(SMS_API_KEY) # api key atrodams aizejot csc mājaslapā pie api>SMS sending un tur augšā jābūt tieši zem login "API key: ..."
+CSC_API_KEY = os.getenv("SMS_API_KEY") # api key atrodams aizejot csc mājaslapā pie api>SMS sending un tur augšā jābūt tieši zem login "API key: ..."
 CSC_SENDER = "Stomatologi" # stomatologi ir nosutitajs un tas vards no ka paradisies no ka sutits sms! Tam obligati ari sadam ir japaliek! Atradu to no sākuma nosūtot īsziņu caur csc mājaslapu.
 
 def generate_signature(params: dict, api_key: str) -> str:
