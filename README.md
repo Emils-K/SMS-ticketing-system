@@ -1,6 +1,6 @@
 # Helpdesk SMS Notification System - Starting Guide
 
-This project is a FastAPI-based backend designed to manage support requests and trigger SMS notifications to specialists using the `csc.lv` API.
+This project is a FastAPI backend designed to manage support requests and trigger SMS notifications to specialists using the `csc.lv` API.
 
 ## 📋 Requirements
 
@@ -36,9 +36,6 @@ uvicorn main:app --reload
 ```
 The API will be available at `http://127.0.0.1:8000`.
 
-### 4. Access the Dashboard
-Open the `index.html` file in your preferred web browser to access the management interface. The frontend is configured to communicate with the local API.
-
 ---
 
 ## 🛠 Project Structure
@@ -48,7 +45,6 @@ Open the `index.html` file in your preferred web browser to access the managemen
 - `schemas.py`: Pydantic models for data validation and API documentation.
 - `database.py`: Database connection and session management.
 - `helpdesk.db`: Local SQLite database file (created automatically on first run).
-- `index.html`: The frontend dashboard for interaction.
 
 ## 📡 API Documentation
 Once the server is running, you can explore the interactive API documentation at:

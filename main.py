@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 import requests
 import time
 import hashlib
-from fastapi.responses import FileResponse
 import models, schemas
 from database import engine, get_db, SessionLocal
 import logging
@@ -32,20 +31,15 @@ ensure_sqlite_schema(engine)
 
 app = FastAPI(title="Helpdesk Notifications API")
 
-# Serve dashboard
-@app.get("/")
-@app.get("/index.html")
-async def serve_index():
-    return FileResponse("index.html")
-
-# Setup CORS to allow requests from the HTML frontend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+CORS_ORIGINS = [o.strip() for o in os.getenv("CORS_ORIGINS", "").split(",") if o.strip()]
+if CORS_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 os.makedirs("logs", exist_ok=True)
 logging.basicConfig(
