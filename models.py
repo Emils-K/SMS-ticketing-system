@@ -31,6 +31,7 @@ class SupportRequest(Base):
     created_at = Column(Integer, nullable=True)
     assigned_at = Column(Integer, nullable=True)
     resolved_at = Column(Integer, nullable=True)
+    sms_sent_at = Column(Integer, nullable=True)
     
     assigned_specialist_id = Column(Integer, ForeignKey("specialists.id"), nullable=True)
     assigned_specialist = relationship("Specialist", back_populates="requests")

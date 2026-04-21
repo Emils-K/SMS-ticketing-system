@@ -30,6 +30,7 @@ def ensure_sqlite_schema(engine: Engine) -> None:
         ("support_requests", "created_at", "INTEGER"),
         ("support_requests", "assigned_at", "INTEGER"),
         ("support_requests", "resolved_at", "INTEGER"),
+        ("support_requests", "sms_sent_at", "INTEGER"),
     )
 
     for table, column, col_type in desired:

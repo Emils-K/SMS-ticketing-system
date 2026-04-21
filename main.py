@@ -450,30 +450,43 @@ def assign_request(request_id: int, assignment: schemas.AssignRequest, db: Sessi
         raise HTTPException(status_code=404, detail="Specialist not found")
         
     # Update DB status
+    now = int(time.time())
     db_request.assigned_specialist_id = db_specialist.id
     db_request.status = "Assigned"
-    db_request.assigned_at = int(time.time())
+    db_request.assigned_at = now
     db.commit()
     db.refresh(db_request)
-    
-    # Fire the exact API logic requested
-    msg_content = f"{db_request.institute_branch} Room {db_request.office_number} - Priority: {db_request.priority}. Problem: {db_request.message}"
-    result = send_sms(db_specialist.phone_number, msg_content)
-    try:
-        db.add(
-            models.SmsAuditLog(
-                ticket_id=db_request.id,
-                recipient=mask_last4(db_specialist.phone_last4) or mask_last4(result.get("recipient_last4")),
-                timestamp=int(result.get("timestamp") or time.time()),
-                provider_response_code=result.get("provider_response_code"),
-                cost=result.get("cost"),
-                http_status=result.get("http_status"),
-                provider_message=result.get("provider_message"),
-            )
-        )
+
+    # Limit: only one SMS per support request (ticket).
+    # We "reserve" sending by setting sms_sent_at once (atomic update). If it is already set, skip sending.
+    reserved = (
+        db.query(models.SupportRequest)
+        .filter(models.SupportRequest.id == request_id)
+        .filter(models.SupportRequest.sms_sent_at.is_(None))
+        .update({models.SupportRequest.sms_sent_at: now}, synchronize_session=False)
+    )
+    if reserved:
         db.commit()
-    except Exception as e:
-        logging.warning(f"Could not write SMS audit log: {e}")
+
+        msg_content = f"{db_request.institute_branch} Room {db_request.office_number} - Priority: {db_request.priority}. Problem: {db_request.message}"
+        result = send_sms(db_specialist.phone_number, msg_content)
+        try:
+            db.add(
+                models.SmsAuditLog(
+                    ticket_id=db_request.id,
+                    recipient=mask_last4(db_specialist.phone_last4) or mask_last4(result.get("recipient_last4")),
+                    timestamp=int(result.get("timestamp") or time.time()),
+                    provider_response_code=result.get("provider_response_code"),
+                    cost=result.get("cost"),
+                    http_status=result.get("http_status"),
+                    provider_message=result.get("provider_message"),
+                )
+            )
+            db.commit()
+        except Exception as e:
+            logging.warning(f"Could not write SMS audit log: {e}")
+    else:
+        logging.info(f"SMS already sent for ticket {db_request.id}; skipping re-send.")
     
     return _request_out(db_request)
 
