@@ -35,6 +35,9 @@ class SupportRequestResponse(SupportRequestBase):
     id: int
     status: str
     assigned_specialist_id: Optional[int] = None
+    created_at: Optional[int] = None
+    assigned_at: Optional[int] = None
+    resolved_at: Optional[int] = None
     
     class Config:
         from_attributes = True
@@ -42,3 +45,29 @@ class SupportRequestResponse(SupportRequestBase):
 
 class AssignRequest(BaseModel):
     specialist_id: int
+
+
+class SmsAuditLogResponse(BaseModel):
+    id: int
+    ticket_id: Optional[int] = None
+    recipient: str
+    timestamp: int
+    provider_response_code: Optional[str] = None
+    cost: Optional[float] = None
+
+    http_status: Optional[int] = None
+    provider_message: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class SystemAlertResponse(BaseModel):
+    id: int
+    alert_type: str
+    message: str
+    created_at: int
+    resolved_at: Optional[int] = None
+
+    class Config:
+        from_attributes = True
